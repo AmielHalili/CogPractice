@@ -65,12 +65,68 @@ public class BankAppRunner {
     // admin page
    private static void adminPage() {
       System.out.println("Welcome to the admin page");
-      
+      System.out.println("What would you like to do?");
+      Scanner sc = new Scanner(System.in);
+      System.out.println("1. View all users");
+      System.out.println("2. Add a new user");
+      System.out.println("3. Delete a user");
+      System.out.println("4. Exit");
+
+      switch (sc.nextInt()) {
+         case 1:
+            System.out.println("Viewing all users");
+            break;
+         case 2:
+            System.out.println("Adding a new user");
+            break;
+         case 3:
+            System.out.println("Deleting a user");
+            break;
+         case 4:
+            System.out.println("Exiting");
+            break;
+         default:
+            System.out.println("Invalid choice");
+      }
    }
 
    // customer page
    private static void customerPage() {
       System.out.println("Welcome to the customer page");
+      System.out.println("What would you like to do?");
+      Scanner sc = new Scanner(System.in);
+      System.out.println("1. View account balance");
+      System.out.println("2. Deposit money");
+      System.out.println("3. Withdraw money");
+      System.out.println("4. Transfer money");
+      System.out.println("5. Exit");
+      switch (sc.nextInt()) {
+         case 1:
+            System.out.println("Viewing account balance");
+            ViewAccountBalance();
+            break;
+         case 2:
+            System.out.println("Depositing money");
+            break;
+         case 3:
+            System.out.println("Withdrawing money");
+            break;
+         case 4:
+            System.out.println("Transferring money");
+            break;
+         case 5:
+            System.out.println("Exiting");
+            break;
+         default:
+            System.out.println("Invalid choice");
+      }
+
+   }
+   
+
+   // view acc balance, still need to integrate with account class and user class to get the actual balance of the user
+   private static void ViewAccountBalance() {
+      System.out.println("Your account balance is: $" + 1000.00);
    }
 
    
