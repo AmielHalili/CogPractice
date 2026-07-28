@@ -1,17 +1,23 @@
 export class Account {
   #accountNumber;
   #balance;
+  #interestRate;
 
-  constructor(accountNumber, balance) {
+  constructor(accountNumber, balance, rate =0.00) {
     this.#accountNumber = accountNumber;
     this.#balance = balance;
+    this.#interestRate = rate;
   }
 
   get accountNumber() { return this.#accountNumber; }
   get balance() { return this.#balance; }
 
   getInterestRate() {
-    return 0.0;
+    return this.#interestRate;
+  }
+
+  setInterestRate(newRate) {
+    this.#interestRate = Number(newRate);
   }
 
   deposit(amount) {
@@ -35,11 +41,17 @@ export class Account {
 }
 
 export class CheckingAccount extends Account {
-  getInterestRate() { return 0.01; }
+  constructor(accountNumber, balance) {
+    super(accountNumber, balance);
+    this.setInterestRate(0.01);
+  }
 }
 
 export class SavingsAccount extends Account {
-  getInterestRate() { return 0.03; }
+    constructor(accountNumber, balance) {
+    super(accountNumber, balance);
+    this.setInterestRate(0.03);
+    }
 }
 
 export class User {

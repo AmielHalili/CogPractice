@@ -1,6 +1,6 @@
 import { User, SavingsAccount, CheckingAccount } from '../models/bankModels.js';
 
-// Replicates: static Map<String, User> map = new HashMap<>();
+// hashmap
 const bankDatabase = new Map();
 
 //initali data and paosswords
@@ -62,6 +62,21 @@ export const getAccountDetails = (username) => {
   };
 };
 
+//update interstrate with put 
+export const updateInterestRate = (username, newRate) => {
+  const user = bankDatabase.get(username);
+  if (!user || !user.account) throw new Error("Account context lost.");
+  if (typeof newRate !== 'number' || newRate < 0) throw new Error("Interest rate cannot be negative.");
+  
+  user.account.setInterestRate(newRate);
+  return {
+    username: user.username,
+    accountNumber: user.account.accountNumber,
+    newRate: user.account.getInterestRate()
+  }
+  
+}
+
 export const executeDeposit = (username, amount) => {
   const user = bankDatabase.get(username);
   if (!user || !user.account) throw new Error("Account context lost.");
@@ -85,8 +100,7 @@ export const executeTransfer = (sourceUsername, targetUsername, amount) => {
   return sourceUser.account.balance;
 };
 
-
+//for hamp
 export const fetchAllUsers = async () => {
-  // Your logic to get users or read from the bank database map
   return ["admin", "user1", "user2", "amiel"]; 
 };
