@@ -39,8 +39,8 @@ export const authenticateUser = async (username, password) => {
 };
 
 export const getAllUsernames = async () => {
-  const users = await User.find({}, 'username');
-  return users.map(u => u.username);
+  const users = await User.find({ username: { $ne: 'admin' } }, '-password -__v'); // Exclude admin from the list for non-admin users
+  return users;
 };
 
 export const createNewUser = async (username, password, initialBalance, accountType) => {
