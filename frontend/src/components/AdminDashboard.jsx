@@ -2,19 +2,20 @@
 
 import React, { useEffect, useState } from 'react';
 
+import {fetchUsers, updateRate} from '../api.js';
+
+
 
 
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
+  const loadUsers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/bank/admin/users');
-        const data = await response.json();
-        if (data.success) {
+        const response = await fetchUsers();
+        if (response.data.success) {
           
-          setUsers(data.users.map(user => ({
+          setUsers(response.data.users.map(user => ({
             username: user.username,
             accountType: user.account?.accountType ?? '—',
             balance: user.account?.balance ?? '—',
@@ -29,7 +30,19 @@ function AdminDashboard() {
         console.error('Error fetching users:', error);
       }
     };
-    fetchUsers();
+
+  const handleEditClick = (username) => {
+    const newRate = prompt(`Enter new interest rate for ${username}:`);
+    if (newRate !== null) {
+      updateRate(username, newRate)
+      console.log(`Updating interest rate for ${username} to ${newRate}`);
+      loadUsers(); // Refresh the user list after updating the rat
+    }
+  };
+
+  useEffect(() => {
+    
+    loadUsers();
   }, []);
 
   return (
@@ -64,7 +77,9 @@ function AdminDashboard() {
                     <td className="px-5 py-3 text-slate-600">{user.rate}</td>
                     <td className="px-5 py-3">
                       <div className="flex gap-3">
-                        <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+                        <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                          onClick={() => handleEditClick(user.username)}
+                        >
                           Edit rate
                         </button>
                         <button className="text-sm font-medium text-red-500 hover:text-red-600">

@@ -39,7 +39,7 @@ export const authenticateUser = async (username, password) => {
 };
 
 export const getAllUsernames = async () => {
-  const users = await User.find({}, '-password -__v');
+  const users = await User.find({ username: { $ne: 'admin' } }, '-password -__v'); // Exclude admin from the list for non-admin users
   return users;
 };
 
