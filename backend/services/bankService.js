@@ -39,8 +39,8 @@ export const authenticateUser = async (username, password) => {
 };
 
 export const getAllUsernames = async () => {
-  const users = await User.find({}, 'username');
-  return users.map(u => u.username);
+  const users = await User.find({}, '-password -__v');
+  return users;
 };
 
 export const createNewUser = async (username, password, initialBalance, accountType) => {
