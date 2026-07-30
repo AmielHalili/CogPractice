@@ -11,15 +11,15 @@ function LoginForm() {
       <form className="space-y-5">
         <div>
           <label
-            htmlFor="username"
+            htmlFor="email"
             className="mb-1.5 block text-sm font-medium text-slate-700"
           >
-            Username
+            Email
           </label>
           <input
-            id="username"
-            type="text"
-            placeholder="Enter your username"
+            id="email"
+            type="email"
+            placeholder="Enter your email"
             className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
           />
         </div>

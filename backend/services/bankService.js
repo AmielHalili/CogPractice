@@ -1,147 +1,152 @@
 // services/bankService.js
-import { User } from '../models/bankModels.js';
+import { User, Account, Transaction } from '../models/bankModels.js';
 
 // Seed initial data if database is empty
-{/* Seed initial data if database is empty 
+{/*
 export const initData = async () => {
   const count = await User.countDocuments();
   if (count === 0) {
-    await User.create([
-      { username: 'admin', password: 'admin123' },
-      { 
-        username: 'user1', 
-        password: 'pass1', 
-        account: { accountNumber: 'SAV-user1', balance: 1000.00, interestRate: 0.03, accountType: 'savings' } 
-      },
-      { 
-        username: 'user2', 
-        password: 'pass2', 
-        account: { accountNumber: 'SAV-user2', balance: 1000.00, interestRate: 0.03, accountType: 'savings' } 
-      },
-      { 
-        username: 'amiel', 
-        password: 'halili', 
-        account: { accountNumber: 'SAV-amiel', balance: 1000.00, interestRate: 0.03, accountType: 'savings' } 
-      }
-    ]);
+    const admin = await User.create({ name: 'Admin', email: 'admin@bank.com', password: 'admin123', role: 'admin' });
+
+    const user1 = await User.create({ name: 'User One', email: 'user1@bank.com', password: 'pass1', role: 'customer' });
+    await Account.create({ user: user1._id, accountNumber: 'SAV-user1', balance: 1000.00, interestRate: 0.03, accountType: 'savings' });
+
+    const user2 = await User.create({ name: 'User Two', email: 'user2@bank.com', password: 'pass2', role: 'customer' });
+    await Account.create({ user: user2._id, accountNumber: 'SAV-user2', balance: 1000.00, interestRate: 0.03, accountType: 'savings' });
+
+    const amiel = await User.create({ name: 'Amiel Halili', email: 'amiel@bank.com', password: 'halili', role: 'customer' });
+    await Account.create({ user: amiel._id, accountNumber: 'SAV-amiel', balance: 1000.00, interestRate: 0.03, accountType: 'savings' });
+
     console.log("Database seeded with default users.");
   }
 };
-
 */}
 
-export const authenticateUser = async (username, password) => {
-  const user = await User.findOne({ username });
+
+export const authenticateUser = async (email, password) => {
+  const user = await User.findOne({ email });
   if (!user || user.password !== password) {
-    throw new Error("Invalid username or password");
+    throw new Error("Invalid email or password");
   }
   return user;
 };
 
-export const getAllUsernames = async () => {
-  const users = await User.find({ username: { $ne: 'admin' } }, '-password -__v'); // Exclude admin from the list for non-admin users
-  return users;
+export const getAllUsers = async () => {
+  const users = await User.find({ role: { $ne: 'admin' } }, '-password -__v').lean();
+  const accounts = await Account.find({ user: { $in: users.map(u => u._id) } }).lean();
+  const accountByUser = new Map(accounts.map(a => [String(a.user), a]));
+
+  return users.map(u => ({
+    ...u,
+    account: accountByUser.get(String(u._id)) ?? null
+  }));
 };
 
-export const createNewUser = async (username, password, initialBalance, accountType) => {
-  const existingUser = await User.findOne({ username });
+export const createNewUser = async (name, email, password, initialBalance, accountType) => {
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new Error("Username already exists.");
+    throw new Error("Email already exists.");
   }
 
   const isChecking = accountType === 1 || accountType === 'checking';
-  const newAccount = {
-    accountNumber: `${isChecking ? 'CHK' : 'SAV'}-${username}`,
+
+  const newUser = await User.create({ name, email, password, role: 'customer' });
+
+  await Account.create({
+    user: newUser._id,
+    accountNumber: `${isChecking ? 'CHK' : 'SAV'}-${email.split('@')[0]}`,
     balance: Number(initialBalance),
     interestRate: isChecking ? 0.01 : 0.03,
     accountType: isChecking ? 'checking' : 'savings'
-  };
-
-  const newUser = await User.create({
-    username,
-    password,
-    account: newAccount
   });
 
-  return newUser.username;
+  return newUser.email;
 };
 
-export const removeUser = async (username) => {
-  if (username === "admin") throw new Error("Cannot delete the admin user.");
-  const deleted = await User.findOneAndDelete({ username });
-  if (!deleted) throw new Error("User not found.");
+export const removeUser = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("User not found.");
+  if (user.role === "admin") throw new Error("Cannot delete the admin user.");
+
+  const account = await Account.findOneAndDelete({ user: user._id });
+  if (account) await Transaction.deleteMany({ account: account._id });
+  await User.deleteOne({ _id: user._id });
 };
 
-export const getAccountDetails = async (username) => {
-  const user = await User.findOne({ username });
-  if (!user || !user.account) throw new Error("Account details missing.");
+const findAccountByEmail = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) throw new Error("Account context lost.");
+  const account = await Account.findOne({ user: user._id });
+  if (!account) throw new Error("Account context lost.");
+  return account;
+};
+
+export const getAccountDetails = async (email) => {
+  const account = await findAccountByEmail(email);
   return {
-    accountNumber: user.account.accountNumber,
-    balance: user.account.balance,
-    interestRate: user.account.interestRate
+    accountNumber: account.accountNumber,
+    balance: account.balance,
+    interestRate: account.interestRate
   };
 };
 
-export const updateInterestRate = async (username, newRate) => {
+export const updateInterestRate = async (email, newRate) => {
   const numericRate = Number(newRate);
   if (isNaN(numericRate) || numericRate < 0) throw new Error("Interest rate cannot be negative.");
 
-  const user = await User.findOne({ username });
-  if (!user || !user.account) throw new Error("Account context lost.");
-
-  user.account.interestRate = numericRate;
-  await user.save();
+  const account = await findAccountByEmail(email);
+  account.interestRate = numericRate;
+  await account.save();
 
   return {
-    username: user.username,
-    accountNumber: user.account.accountNumber,
-    newRate: user.account.interestRate
+    email,
+    accountNumber: account.accountNumber,
+    newRate: account.interestRate
   };
 };
 
-export const executeDeposit = async (username, amount) => {
+export const executeDeposit = async (email, amount) => {
   const numAmount = Number(amount);
   if (numAmount <= 0) throw new Error("Deposit amount must be positive.");
 
-  const user = await User.findOne({ username });
-  if (!user || !user.account) throw new Error("Account context lost.");
+  const account = await findAccountByEmail(email);
+  account.balance += numAmount;
+  await account.save();
+  await Transaction.create({ account: account._id, txnType: 'deposit', amount: numAmount });
 
-  user.account.balance += numAmount;
-  await user.save();
-  return user.account.balance;
+  return account.balance;
 };
 
-export const executeWithdrawal = async (username, amount) => {
+export const executeWithdrawal = async (email, amount) => {
   const numAmount = Number(amount);
   if (numAmount <= 0) throw new Error("Withdrawal amount must be positive.");
 
-  const user = await User.findOne({ username });
-  if (!user || !user.account) throw new Error("Account context lost.");
+  const account = await findAccountByEmail(email);
+  if (numAmount > account.balance) throw new Error("Insufficient funds.");
 
-  if (numAmount > user.account.balance) throw new Error("Insufficient funds.");
+  account.balance -= numAmount;
+  await account.save();
+  await Transaction.create({ account: account._id, txnType: 'withdrawal', amount: numAmount });
 
-  user.account.balance -= numAmount;
-  await user.save();
-  return user.account.balance;
+  return account.balance;
 };
 
-export const executeTransfer = async (sourceUsername, targetUsername, amount) => {
+export const executeTransfer = async (sourceEmail, targetEmail, amount) => {
   const numAmount = Number(amount);
   if (numAmount <= 0) throw new Error("Transfer amount must be positive.");
 
-  const sourceUser = await User.findOne({ username: sourceUsername });
-  const targetUser = await User.findOne({ username: targetUsername });
+  const sourceAccount = await findAccountByEmail(sourceEmail);
+  const targetAccount = await findAccountByEmail(targetEmail);
 
-  if (!sourceUser || !sourceUser.account) throw new Error("Source account missing.");
-  if (!targetUser || !targetUser.account) throw new Error("Recipient account not found.");
+  if (numAmount > sourceAccount.balance) throw new Error("Insufficient funds.");
 
-  if (numAmount > sourceUser.account.balance) throw new Error("Insufficient funds.");
+  sourceAccount.balance -= numAmount;
+  targetAccount.balance += numAmount;
 
-  sourceUser.account.balance -= numAmount;
-  targetUser.account.balance += numAmount;
+  await sourceAccount.save();
+  await targetAccount.save();
+  await Transaction.create({ account: sourceAccount._id, txnType: 'transfer_out', amount: numAmount });
+  await Transaction.create({ account: targetAccount._id, txnType: 'transfer_in', amount: numAmount });
 
-  await sourceUser.save();
-  await targetUser.save();
-
-  return sourceUser.account.balance;
+  return sourceAccount.balance;
 };
