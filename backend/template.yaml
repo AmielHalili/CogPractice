@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Bank app API - HTTP API (payload format 2.0) with direct Lambda handlers per route.
+
+Parameters:
+  MongoUri:
+    Type: String
+    NoEcho: true
+    Description: MongoDB connection string (Atlas SRV URI, etc.)
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    MemorySize: 256
+    Environment:
+      Variables:
+        MONGO_URI: !Ref MongoUri
+
+Resources:
+  BankHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        AllowHeaders:
+          - content-type
+
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/login.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/login
+            Method: POST
+            PayloadFormatVersion: "2.0"
+
+  AdminGetUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/adminGetUsers.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/admin/users
+            Method: GET
+            PayloadFormatVersion: "2.0"
+
+  AdminCreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/adminCreateUser.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/admin/users
+            Method: POST
+            PayloadFormatVersion: "2.0"
+
+  AdminDeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/adminDeleteUser.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/admin/users/{username}
+            Method: DELETE
+            PayloadFormatVersion: "2.0"
+
+  AdminUpdateRateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/adminUpdateRate.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/admin/users/{username}/rate
+            Method: PUT
+            PayloadFormatVersion: "2.0"
+
+  CustomerGetBalanceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/customerGetBalance.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/customer/{username}/balance
+            Method: GET
+            PayloadFormatVersion: "2.0"
+
+  CustomerDepositFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/customerDeposit.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/customer/{username}/deposit
+            Method: POST
+            PayloadFormatVersion: "2.0"
+
+  CustomerWithdrawFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/customerWithdraw.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/customer/{username}/withdraw
+            Method: POST
+            PayloadFormatVersion: "2.0"
+
+  CustomerTransferFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda/handlers/customerTransfer.handler
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref BankHttpApi
+            Path: /api/bank/customer/{username}/transfer
+            Method: POST
+            PayloadFormatVersion: "2.0"
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the HTTP API
+    Value: !Sub "https://${BankHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

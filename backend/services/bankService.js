@@ -78,7 +78,7 @@ export const getAccountDetails = async (username) => {
   return {
     accountNumber: user.account.accountNumber,
     balance: user.account.balance,
-    interestRate: `${user.account.interestRate * 100}%`
+    interestRate: user.account.interestRate
   };
 };
 

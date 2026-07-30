@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
-import {fetchUsers, updateRate} from '../api.js';
+import {fetchUsers, updateRate, deleteUser} from '../api.js';
 
 
 
@@ -31,14 +31,31 @@ function AdminDashboard() {
       }
     };
 
-  const handleEditClick = (username) => {
+  const handleEditClick = async (username) => {
     const newRate = prompt(`Enter new interest rate for ${username}:`);
     if (newRate !== null) {
-      updateRate(username, newRate)
-      console.log(`Updating interest rate for ${username} to ${newRate}`);
-      loadUsers(); // Refresh the user list after updating the rat
+      try {
+        await updateRate(username, newRate);
+        console.log(`Interest rate for ${username} updated to ${newRate}`);
+        loadUsers(); // Refresh the user list after updating the rate
+      } catch (error) {
+        console.error(`Error updating interest rate for ${username}:`, error);
+      }
+  
     }
   };
+
+  const handleDeleteClick = async (username) => {
+    if (window.confirm(`Are you sure you want to delete user ${username}?`)) {
+      try {
+        await deleteUser(username);
+        console.log(`User ${username} deleted successfully`);
+        loadUsers(); // Refresh the user list after deletion
+      } catch (error) {
+        console.error(`Error deleting user ${username}:`, error);
+      }
+    }
+  }
 
   useEffect(() => {
     
@@ -82,7 +99,8 @@ function AdminDashboard() {
                         >
                           Edit rate
                         </button>
-                        <button className="text-sm font-medium text-red-500 hover:text-red-600">
+                        <button className="text-sm font-medium text-red-500 hover:text-red-600"
+                          onClick={() => handleDeleteClick(user.username)}>
                           Delete
                         </button>
                       </div>
