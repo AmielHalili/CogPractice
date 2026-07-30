@@ -5,31 +5,31 @@ const API = axios.create({
 });
 
 // LOGIN
-export const login = (username, password) => 
-  API.post('/login', { username, password });
+export const login = (email, password) =>
+  API.post('/login', { email, password });
 
 // ADMIN CRUD
-export const fetchUsers = () => 
+export const fetchUsers = () =>
   API.get('/admin/users');
 
-export const createUser = (userData) => 
+export const createUser = (userData) =>
   API.post('/admin/users', userData);
 
-export const deleteUser = (username) => 
-  API.delete(`/admin/users/${username}`);
+export const deleteUser = (email) =>
+  API.delete(`/admin/users/${email}`);
 
-export const updateRate = (username, newRate) => 
-  API.put(`/admin/users/${username}/rate`, { newRate });
+export const updateRate = (email, newRate) =>
+  API.put(`/admin/users/${email}/rate`, { newRate });
 
 // CUSTOMER CRUD
-export const getBalance = (username) => 
-  API.get(`/customer/${username}/balance`);
+export const getBalance = (email) =>
+  API.get(`/customer/${email}/balance`);
 
-export const deposit = (username, amount) => 
-  API.post(`/customer/${username}/deposit`, { amount });
+export const deposit = (email, amount) =>
+  API.post(`/customer/${email}/deposit`, { amount });
 
-export const withdraw = (username, amount) => 
-  API.post(`/customer/${username}/withdraw`, { amount });
+export const withdraw = (email, amount) =>
+  API.post(`/customer/${email}/withdraw`, { amount });
 
-export const transfer = (username, targetUsername, amount) => 
-  API.post(`/customer/${username}/transfer`, { targetUsername, amount });
+export const transfer = (email, targetEmail, amount) =>
+  API.post(`/customer/${email}/transfer`, { targetEmail, amount });

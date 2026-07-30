@@ -1,4 +1,39 @@
+import {login} from "../api";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+
 function LoginForm() {
+  const [submitError, setSubmitError] = useState(null);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try{
+      const formData = new FormData(event.target);
+      const email = formData.get('email');
+      const password = formData.get('password');
+      const response = await login(email, password);
+      if (response.data.success) {
+        const role = response.data.role;
+        if (role === 'admin') {
+          navigate('/admin');
+        } else if (role === 'customer') {
+          navigate('/customer');
+        } else {
+          setSubmitError('Unknown user role.');
+        }
+      } else {
+        setSubmitError(response.data.message || 'Login failed.');
+      }
+    }
+    catch (error) {
+      setSubmitError(error.response?.data?.message || 'An error occurred during login.');
+    }
+    
+  }
+
+
   return (
     <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
       <div className="mb-8">
@@ -7,19 +42,22 @@ function LoginForm() {
           Enter your credentials to access your account.
         </p>
       </div>
+      {submitError && <p className="mb-4 text-sm text-red-600">{submitError}</p>}
 
-      <form className="space-y-5">
+      <form className="space-y-5"
+      onSubmit={handleSubmit}>
         <div>
           <label
-            htmlFor="username"
+            htmlFor="email"
             className="mb-1.5 block text-sm font-medium text-slate-700"
           >
-            Username
+            Email
           </label>
           <input
-            id="username"
-            type="text"
-            placeholder="Enter your username"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Enter your email"
             className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
           />
         </div>
@@ -38,6 +76,7 @@ function LoginForm() {
           </div>
           <input
             id="password"
+            name="password"
             type="password"
             placeholder="Enter your password"
             className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
@@ -47,6 +86,7 @@ function LoginForm() {
         <button
           type="submit"
           className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+          
         >
           Sign in
         </button>
