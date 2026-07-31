@@ -1,5 +1,7 @@
 // services/bankService.js
 import { User, Account, Transaction } from '../models/bankModels.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 // Seed initial data if database is empty
 {/*
@@ -25,10 +27,19 @@ export const initData = async () => {
 
 export const authenticateUser = async (email, password) => {
   const user = await User.findOne({ email });
-  if (!user || user.password !== password) {
-    throw new Error("Invalid email or password");
+  try{
+    if (!user) throw new Error("User not found.");
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new Error("Invalid password.");
+  }catch (error) {
+    throw new Error("Invalid email or password.");
   }
-  return user;
+  const token = await jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+   
+  return {
+    role: user.role,
+    token
+  };
 };
 
 export const getAllUsers = async () => {
@@ -50,7 +61,10 @@ export const createNewUser = async (name, email, password, initialBalance, accou
 
   const isChecking = accountType === 1 || accountType === 'checking';
 
-  const newUser = await User.create({ name, email, password, role: 'customer' });
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+
+  const newUser = await User.create({ name, email, password:hashedPassword, role: 'customer' });
 
   await Account.create({
     user: newUser._id,

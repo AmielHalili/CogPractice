@@ -1,6 +1,7 @@
 // routes/bankRoutes.js
 import express from 'express';
 import * as bankService from '../services/bankService.js';
+import { requireAuth, requireAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -8,15 +9,15 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await bankService.authenticateUser(email, password);
-    res.status(200).json({ success: true, message: "Login successful", role: user.role });
+    const { role, token } = await bankService.authenticateUser(email, password);
+    res.status(200).json({ success: true, message: "Login successful", role, token });
   } catch (error) {
     res.status(401).json({ success: false, message: error.message });
   }
 });
 
 // admin view all users
-router.get('/admin/users', async (req, res) => {
+router.get('/admin/users', requireAuth, requireAdmin, async (req, res) => {
   try {
     const users = await bankService.getAllUsers();
     res.status(200).json({ success: true, users });
@@ -26,7 +27,7 @@ router.get('/admin/users', async (req, res) => {
 });
 
 // admin add user
-router.post('/admin/users', async (req, res) => {
+router.post('/admin/users', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { name, email, password, initialBalance, accountType } = req.body;
     await bankService.createNewUser(name, email, password, initialBalance, accountType);
@@ -37,7 +38,7 @@ router.post('/admin/users', async (req, res) => {
 });
 
 // admin delete user
-router.delete('/admin/users/:email', async (req, res) => {
+router.delete('/admin/users/:email', requireAuth, requireAdmin, async (req, res) => {
   try {
     await bankService.removeUser(req.params.email);
     res.status(200).json({ success: true, message: `User ${req.params.email} deleted successfully.` });
@@ -47,7 +48,7 @@ router.delete('/admin/users/:email', async (req, res) => {
 });
 
 // updating rate
-router.put('/admin/users/:email/rate', async (req, res) => {
+router.put('/admin/users/:email/rate', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { email } = req.params;
     const { newRate } = req.body;
@@ -59,7 +60,7 @@ router.put('/admin/users/:email/rate', async (req, res) => {
 });
 
 // customer view balance
-router.get('/customer/:email/balance', async (req, res) => {
+router.get('/customer/:email/balance', requireAuth, async (req, res) => {
   try {
     const info = await bankService.getAccountDetails(req.params.email);
     res.status(200).json({ success: true, data: info });
@@ -69,7 +70,7 @@ router.get('/customer/:email/balance', async (req, res) => {
 });
 
 // customer deposit
-router.post('/customer/:email/deposit', async (req, res) => {
+router.post('/customer/:email/deposit', requireAuth, async (req, res) => {
   try {
     const newBalance = await bankService.executeDeposit(req.params.email, req.body.amount);
     res.status(200).json({ success: true, message: `Deposited $${req.body.amount}`, newBalance });
@@ -79,7 +80,7 @@ router.post('/customer/:email/deposit', async (req, res) => {
 });
 
 // customer withdraw
-router.post('/customer/:email/withdraw', async (req, res) => {
+router.post('/customer/:email/withdraw', requireAuth, async (req, res) => {
   try {
     const newBalance = await bankService.executeWithdrawal(req.params.email, req.body.amount);
     res.status(200).json({ success: true, message: `Withdrew $${req.body.amount}`, newBalance });
@@ -89,7 +90,7 @@ router.post('/customer/:email/withdraw', async (req, res) => {
 });
 
 // customer transfer
-router.post('/customer/:email/transfer', async (req, res) => {
+router.post('/customer/:email/transfer', requireAuth, async (req, res) => {
   try {
     const { targetEmail, amount } = req.body;
     const newBalance = await bankService.executeTransfer(req.params.email, targetEmail, amount);

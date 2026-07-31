@@ -1,5 +1,8 @@
+import { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import anchorIcon from '../assets/anchoricon.png';
+import { AuthContext } from '../context/AuthContext';
+
 
 const navLinks = [
   { label: 'Home', href: '/' },
@@ -11,6 +14,7 @@ const navLinks = [
 function Header({ variant = 'marketing', subtitle }) {
   const isMarketing = variant === 'marketing';
   const isDashboard = variant === 'dashboard';
+  const { logout } = useContext(AuthContext);
 
   return (
     <header
@@ -70,7 +74,11 @@ function Header({ variant = 'marketing', subtitle }) {
         )}
 
         {isDashboard && (
-          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+          <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+            onClick={() => {
+              logout();
+            }}
+          >
             Log out
           </button>
         )}

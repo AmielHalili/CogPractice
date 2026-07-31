@@ -1,12 +1,15 @@
 import {login} from "../api";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+
+import { AuthContext } from "../context/AuthContext";
 
 
 function LoginForm() {
   const [submitError, setSubmitError] = useState(null);
   const navigate = useNavigate();
-
+  const { login: authLogin } = useContext(AuthContext);
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     try{
@@ -16,6 +19,11 @@ function LoginForm() {
       const response = await login(email, password);
       if (response.data.success) {
         const role = response.data.role;
+        const token = response.data.token;
+
+        authLogin(token, role);
+        
+
         if (role === 'admin') {
           navigate('/admin');
         } else if (role === 'customer') {
