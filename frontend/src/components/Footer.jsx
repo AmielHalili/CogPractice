@@ -42,7 +42,7 @@ function Footer() {
                 alt="Anchor Bank"
                 className="h-6 w-6 rounded-full"
               />
-              <span className="font-medium text-slate-700">Anchor Bank</span>
+              <span className="font-heading font-extrabold text-slate-900">Anchor Bank</span>
             </Link>
             <p className="mt-3 text-sm text-slate-500">
               Simple, secure banking with no hidden fees.
@@ -59,7 +59,7 @@ function Footer() {
                   <li key={link.label}>
                     <Link
                       to={link.href}
-                      className="text-sm text-slate-500 hover:text-slate-900"
+                      className="text-sm text-slate-500 hover:text-accent-500"
                     >
                       {link.label}
                     </Link>

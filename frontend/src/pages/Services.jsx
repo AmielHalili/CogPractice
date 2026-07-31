@@ -31,29 +31,29 @@ const services = [
 
 function Services() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-[#F6F7FB]">
       <Header variant="marketing" />
 
-      <section className="bg-slate-900">
-        <div className="mx-auto max-w-7xl px-6 py-20 text-center">
-          <h1 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+      <section className="bg-linear-to-br from-accent-500 to-accent-800">
+        <div className="mx-auto max-w-7xl px-6 py-20 text-center text-white">
+          <h1 className="mx-auto max-w-2xl font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">
             Banking tools for every part of your life.
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-slate-300">
+          <p className="mx-auto mt-5 max-w-xl text-lg text-accent-100">
             From everyday spending to growing a business, Anchor Bank has an
             account built for it.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl flex-1 px-6 py-24">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mx-auto max-w-7xl flex-1 px-6 py-16">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
             <div
               key={service.title}
-              className="rounded-2xl border border-slate-200 p-6"
+              className="rounded-2xl bg-white p-6 shadow-sm transition duration-150 hover:-translate-y-1 hover:shadow-lg"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-100 text-accent-500">
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -64,7 +64,7 @@ function Services() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </span>
-              <h3 className="mt-4 font-semibold text-slate-900">
+              <h3 className="mt-4 font-heading font-extrabold text-slate-900">
                 {service.title}
               </h3>
               <p className="mt-2 text-sm text-slate-500">
@@ -75,8 +75,8 @@ function Services() {
         </div>
       </section>
 
-      <section className="bg-slate-50">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-6 py-20 text-center">
+      <section className="bg-white/60">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-6 py-16 text-center">
           <h2 className="max-w-lg text-3xl font-semibold tracking-tight text-slate-900">
             Not sure which account fits you?
           </h2>
@@ -86,7 +86,7 @@ function Services() {
           </p>
           <Link
             to="/contact"
-            className="rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="rounded-lg bg-accent-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition duration-150 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-lg active:translate-y-0"
           >
             Contact us
           </Link>

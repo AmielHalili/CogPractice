@@ -121,7 +121,9 @@ export const getTransactionHistory = async (userId) => {
   return transactions.map(t => ({
     txnType: t.txnType,
     amount: t.amount,
-    createdAt: t.createdAt
+    createdAt: t.createdAt,
+    counterpartyName: t.counterpartyName,
+    counterpartyEmail: t.counterpartyEmail
   }));
 };
 
@@ -170,6 +172,12 @@ export const executeTransfer = async (sourceUserId, targetEmail, amount) => {
   const numAmount = Number(amount);
   if (isNaN(numAmount) || numAmount <= 0) throw new Error("Transfer amount must be positive.");
 
+  const sourceUser = await User.findById(sourceUserId);
+  if (!sourceUser) throw new Error("Account context lost.");
+
+  const targetUser = await User.findOne({ email: targetEmail });
+  if (!targetUser) throw new Error("Account context lost.");
+
   const sourceAccount = await findAccountByUserId(sourceUserId);
   const targetAccount = await findAccountByEmail(targetEmail);
 
@@ -180,8 +188,20 @@ export const executeTransfer = async (sourceUserId, targetEmail, amount) => {
 
   await sourceAccount.save();
   await targetAccount.save();
-  await Transaction.create({ account: sourceAccount._id, txnType: 'transfer_out', amount: numAmount });
-  await Transaction.create({ account: targetAccount._id, txnType: 'transfer_in', amount: numAmount });
+  await Transaction.create({
+    account: sourceAccount._id,
+    txnType: 'transfer_out',
+    amount: numAmount,
+    counterpartyName: targetUser.name,
+    counterpartyEmail: targetUser.email
+  });
+  await Transaction.create({
+    account: targetAccount._id,
+    txnType: 'transfer_in',
+    amount: numAmount,
+    counterpartyName: sourceUser.name,
+    counterpartyEmail: sourceUser.email
+  });
 
   return sourceAccount.balance;
 };

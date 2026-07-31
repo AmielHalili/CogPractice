@@ -1,4 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-heading: "Archivo", ui-sans-serif, system-ui, sans-serif;
+
+  --color-accent-50: #F4F5FB;
+  --color-accent-100: #EDEFF8;
+  --color-accent-200: #DBDFF0;
+  --color-accent-300: #B9C0E3;
+  --color-accent-400: #8992C7;
+  --color-accent-500: #4B5AA7;
+  --color-accent-600: #3F4B8F;
+  --color-accent-700: #333D78;
+  --color-accent-800: #262E5C;
+  --color-accent-900: #1C2247;
+}
 
 body {
   margin: 0;

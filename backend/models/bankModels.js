@@ -19,10 +19,13 @@ const accountSchema = new mongoose.Schema({
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
 // Mirrors `transactions` table. `account` is the account_id foreign key.
+// counterpartyName/counterpartyEmail are only set on transfer_out/transfer_in rows.
 const transactionSchema = new mongoose.Schema({
   account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account', required: true },
   txnType: { type: String, enum: ['deposit', 'withdrawal', 'transfer_out', 'transfer_in'], required: true },
-  amount: { type: Number, required: true }
+  amount: { type: Number, required: true },
+  counterpartyName: { type: String },
+  counterpartyEmail: { type: String }
 }, { timestamps: { createdAt: true, updatedAt: false } });
 
 export const User = mongoose.model('User', userSchema);

@@ -43,9 +43,9 @@ function LoginForm() {
 
 
   return (
-    <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="w-full max-w-md">
       <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-slate-900">Sign in</h2>
+        <h1 className="font-heading text-2xl font-extrabold text-slate-900">Sign in</h1>
         <p className="mt-1 text-sm text-slate-500">
           Enter your credentials to access your account.
         </p>
@@ -66,7 +66,7 @@ function LoginForm() {
             name="email"
             type="email"
             placeholder="Enter your email"
-            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-100"
           />
         </div>
 
@@ -78,7 +78,7 @@ function LoginForm() {
             >
               Password
             </label>
-            <a href="#" className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+            <a href="#" className="text-sm font-medium text-accent-500 hover:text-accent-700">
               Forgot password?
             </a>
           </div>
@@ -87,14 +87,13 @@ function LoginForm() {
             name="password"
             type="password"
             placeholder="Enter your password"
-            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+            className="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-accent-500 focus:outline-none focus:ring-2 focus:ring-accent-100"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
-          
+          className="w-full rounded-lg bg-accent-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-150 hover:-translate-y-0.5 hover:bg-accent-600 hover:shadow-lg active:translate-y-0"
         >
           Sign in
         </button>

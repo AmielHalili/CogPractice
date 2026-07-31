@@ -28,26 +28,26 @@ const values = [
 
 function About() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-[#F6F7FB]">
       <Header variant="marketing" />
 
-      <section className="bg-slate-900">
-        <div className="mx-auto max-w-7xl px-6 py-20 text-center">
-          <h1 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+      <section className="bg-linear-to-br from-accent-500 to-accent-800">
+        <div className="mx-auto max-w-7xl px-6 py-20 text-center text-white">
+          <h1 className="mx-auto max-w-2xl font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">
             Banking built around people, not fees.
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-slate-300">
+          <p className="mx-auto mt-5 max-w-xl text-lg text-accent-100">
             Anchor Bank started with a simple idea: banking should be
             straightforward, fair, and easy to understand.
           </p>
         </div>
       </section>
 
-      <section className="border-b border-slate-100">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-6 py-12 sm:grid-cols-4">
+      <section className="px-6 py-14">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-5 sm:grid-cols-4">
           {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <p className="text-2xl font-semibold text-slate-900">
+            <div key={stat.label} className="rounded-2xl bg-white p-6 text-center shadow-sm transition duration-150 hover:-translate-y-1 hover:shadow-lg">
+              <p className="font-heading text-2xl font-extrabold text-accent-500">
                 {stat.value}
               </p>
               <p className="mt-1 text-sm text-slate-500">{stat.label}</p>
@@ -56,7 +56,7 @@ function About() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl flex-1 px-6 py-24">
+      <section className="mx-auto max-w-7xl flex-1 px-6 py-16">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <div>
             <h2 className="text-3xl font-semibold tracking-tight text-slate-900">
@@ -74,13 +74,13 @@ function About() {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5">
             {values.map((value) => (
               <div
                 key={value.title}
-                className="rounded-2xl border border-slate-200 p-6"
+                className="rounded-2xl bg-white p-6 shadow-sm transition duration-150 hover:-translate-y-1 hover:shadow-lg"
               >
-                <h3 className="font-semibold text-slate-900">
+                <h3 className="font-heading font-extrabold text-slate-900">
                   {value.title}
                 </h3>
                 <p className="mt-2 text-sm text-slate-500">
