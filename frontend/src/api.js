@@ -22,14 +22,17 @@ export const updateRate = (email, newRate) =>
   API.put(`/admin/users/${email}/rate`, { newRate });
 
 // CUSTOMER CRUD
-export const getBalance = (email) =>
-  API.get(`/customer/${email}/balance`);
+export const getBalance = () =>
+  API.get('/customer/balance');
 
-export const deposit = (email, amount) =>
-  API.post(`/customer/${email}/deposit`, { amount });
+export const deposit = (amount) =>
+  API.post('/customer/deposit', { amount });
 
-export const withdraw = (email, amount) =>
-  API.post(`/customer/${email}/withdraw`, { amount });
+export const withdraw = (amount) =>
+  API.post('/customer/withdraw', { amount });
 
-export const transfer = (email, targetEmail, amount) =>
-  API.post(`/customer/${email}/transfer`, { targetEmail, amount });
+export const transfer = (targetEmail, amount) =>
+  API.post('/customer/transfer', { targetEmail, amount });
+
+export const getTransactions = () =>
+  API.get('/customer/transactions');

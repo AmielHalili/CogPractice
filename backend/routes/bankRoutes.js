@@ -60,19 +60,29 @@ router.put('/admin/users/:email/rate', requireAuth, requireAdmin, async (req, re
 });
 
 // customer view balance
-router.get('/customer/:email/balance', requireAuth, async (req, res) => {
+router.get('/customer/balance', requireAuth, async (req, res) => {
   try {
-    const info = await bankService.getAccountDetails(req.params.email);
+    const info = await bankService.getAccountDetails(req.user.id);
     res.status(200).json({ success: true, data: info });
   } catch (error) {
     res.status(404).json({ success: false, message: error.message });
   }
 });
 
-// customer deposit
-router.post('/customer/:email/deposit', requireAuth, async (req, res) => {
+// customer view transaction history
+router.get('/customer/transactions', requireAuth, async (req, res) => {
   try {
-    const newBalance = await bankService.executeDeposit(req.params.email, req.body.amount);
+    const transactions = await bankService.getTransactionHistory(req.user.id);
+    res.status(200).json({ success: true, transactions });
+  } catch (error) {
+    res.status(404).json({ success: false, message: error.message });
+  }
+});
+
+// customer deposit
+router.post('/customer/deposit', requireAuth, async (req, res) => {
+  try {
+    const newBalance = await bankService.executeDeposit(req.user.id, req.body.amount);
     res.status(200).json({ success: true, message: `Deposited $${req.body.amount}`, newBalance });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -80,9 +90,9 @@ router.post('/customer/:email/deposit', requireAuth, async (req, res) => {
 });
 
 // customer withdraw
-router.post('/customer/:email/withdraw', requireAuth, async (req, res) => {
+router.post('/customer/withdraw', requireAuth, async (req, res) => {
   try {
-    const newBalance = await bankService.executeWithdrawal(req.params.email, req.body.amount);
+    const newBalance = await bankService.executeWithdrawal(req.user.id, req.body.amount);
     res.status(200).json({ success: true, message: `Withdrew $${req.body.amount}`, newBalance });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -90,10 +100,10 @@ router.post('/customer/:email/withdraw', requireAuth, async (req, res) => {
 });
 
 // customer transfer
-router.post('/customer/:email/transfer', requireAuth, async (req, res) => {
+router.post('/customer/transfer', requireAuth, async (req, res) => {
   try {
     const { targetEmail, amount } = req.body;
-    const newBalance = await bankService.executeTransfer(req.params.email, targetEmail, amount);
+    const newBalance = await bankService.executeTransfer(req.user.id, targetEmail, amount);
     res.status(200).json({ success: true, message: `Transferred $${amount} to ${targetEmail}`, newBalance });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });

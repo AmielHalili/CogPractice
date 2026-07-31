@@ -95,13 +95,34 @@ const findAccountByEmail = async (email) => {
   return account;
 };
 
-export const getAccountDetails = async (email) => {
-  const account = await findAccountByEmail(email);
+const findAccountByUserId = async (userId) => {
+  const account = await Account.findOne({ user: userId });
+  if (!account) throw new Error("Account context lost.");
+  return account;
+};
+
+export const getAccountDetails = async (userId) => {
+  const account = await findAccountByUserId(userId);
   return {
     accountNumber: account.accountNumber,
     balance: account.balance,
+    accountType: account.accountType,
     interestRate: account.interestRate
   };
+};
+
+export const getTransactionHistory = async (userId) => {
+  const account = await findAccountByUserId(userId);
+  const transactions = await Transaction.find({ account: account._id })
+    .sort({ createdAt: -1 })
+    .limit(10)
+    .lean();
+
+  return transactions.map(t => ({
+    txnType: t.txnType,
+    amount: t.amount,
+    createdAt: t.createdAt
+  }));
 };
 
 export const updateInterestRate = async (email, newRate) => {
@@ -119,11 +140,11 @@ export const updateInterestRate = async (email, newRate) => {
   };
 };
 
-export const executeDeposit = async (email, amount) => {
+export const executeDeposit = async (userId, amount) => {
   const numAmount = Number(amount);
-  if (numAmount <= 0) throw new Error("Deposit amount must be positive.");
+  if (isNaN(numAmount) || numAmount <= 0) throw new Error("Deposit amount must be positive.");
 
-  const account = await findAccountByEmail(email);
+  const account = await findAccountByUserId(userId);
   account.balance += numAmount;
   await account.save();
   await Transaction.create({ account: account._id, txnType: 'deposit', amount: numAmount });
@@ -131,11 +152,11 @@ export const executeDeposit = async (email, amount) => {
   return account.balance;
 };
 
-export const executeWithdrawal = async (email, amount) => {
+export const executeWithdrawal = async (userId, amount) => {
   const numAmount = Number(amount);
-  if (numAmount <= 0) throw new Error("Withdrawal amount must be positive.");
+  if (isNaN(numAmount) || numAmount <= 0) throw new Error("Withdrawal amount must be positive.");
 
-  const account = await findAccountByEmail(email);
+  const account = await findAccountByUserId(userId);
   if (numAmount > account.balance) throw new Error("Insufficient funds.");
 
   account.balance -= numAmount;
@@ -145,11 +166,11 @@ export const executeWithdrawal = async (email, amount) => {
   return account.balance;
 };
 
-export const executeTransfer = async (sourceEmail, targetEmail, amount) => {
+export const executeTransfer = async (sourceUserId, targetEmail, amount) => {
   const numAmount = Number(amount);
-  if (numAmount <= 0) throw new Error("Transfer amount must be positive.");
+  if (isNaN(numAmount) || numAmount <= 0) throw new Error("Transfer amount must be positive.");
 
-  const sourceAccount = await findAccountByEmail(sourceEmail);
+  const sourceAccount = await findAccountByUserId(sourceUserId);
   const targetAccount = await findAccountByEmail(targetEmail);
 
   if (numAmount > sourceAccount.balance) throw new Error("Insufficient funds.");
