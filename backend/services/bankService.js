@@ -1,6 +1,6 @@
 // services/bankService.js
 import { User, Account, Transaction } from '../models/bankModels.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 // Seed initial data if database is empty
