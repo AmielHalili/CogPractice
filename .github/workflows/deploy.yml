@@ -30,12 +30,12 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AKIAUCBERGMA3IIY5TOW}}
-          aws-secret-access-key: ${{ secrets.ylbyxBDSiDzzBtKxWmGgdqd2h8kw8ypdXA7DSfU5 }}
-          aws-region: ${{ vars.us-east-1 }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Update Lambda function code
-        run: aws lambda update-function-code --function-name ${{ vars.student-amielhalili-bank-api }} --zip-file fileb://lambda-deploy.zip
+        run: aws lambda update-function-code --function-name ${{ vars.LAMBDA_FUNCTION_NAME }} --zip-file fileb://lambda-deploy.zip
 
   deploy-frontend:
     name: Deploy frontend to S3
@@ -61,9 +61,9 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AKIAUCBERGMA3IIY5TOW}}
-          aws-secret-access-key: ${{ secrets.ylbyxBDSiDzzBtKxWmGgdqd2h8kw8ypdXA7DSfU5 }}
-          aws-region: ${{ vars.us-east-1 }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Sync to S3
-        run: aws s3 sync dist/ s3://${{ vars.student-amielhalili-bankuploads }} --delete
+        run: aws s3 sync dist/ s3://${{ vars.S3_BUCKET_NAME }} --delete
